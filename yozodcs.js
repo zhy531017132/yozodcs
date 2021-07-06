@@ -4,10 +4,19 @@
  */
 ; (function () {
     var DcsRender = function (iframeId) {
+        this.isCrossDomain = false;
         if (iframeId) {
             this.customerIframe = document.getElementById(iframeId);
-            this.renderWindow = this.customerIframe.window || this.customerIframe.contentWindow;
-            this.render = this.renderWindow.reader;
+            try {
+                this.renderWindow = this.customerIframe.window || this.customerIframe.contentWindow;
+                this.render = this.renderWindow.reader;
+            } catch (err) {
+                this.isCrossDomain = true
+                addEventListener('message', function (event) {
+                    // console.log(event.source.reader.changePageLast);
+                    // console.log(event.source);
+                })
+            }   
         } else {
             this.render = window.reader
         }
@@ -15,56 +24,118 @@
     DcsRender.prototype = {
         // 页码跳转
         nextPage: function () {
-            this.render.changePageNext();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'nextPage',param:''}, '*')
+            } else {
+                this.render.changePageNext();
+            }
         },
         nextPageSync: function (callback) {
-            this.render.changePageNext();
-            callback.bind(this)();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'nextPage',param:''}, '*');
+                callback.bind(this)();
+            } else {
+                this.render.changePageNext();
+                callback.bind(this)();
+            }
         },
         lastPage: function () {
-            this.render.changePageLast();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'lastPage',param:''}, '*');
+            } else {
+                this.render.changePageLast();
+            }
         },
         lastPageSync: function (callback) {
-            this.render.changePageLast();
-            callback.bind(this)();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'lastPage',param:''}, '*');
+                callback.bind(this)();
+            } else {
+                this.render.changePageLast();
+                callback.bind(this)();
+            }
         },
         gotoPage: function (index) {
-            this.render.changePage(index);
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'gotoPage',param:index}, '*');
+            } else {
+                this.render.changePage(index);
+            }
         },
         gotoPageSync: function (index, callback) {
-            this.render.changePage(index);
-            callback.bind(this)();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'gotoPage',param:index}, '*');
+                callback.bind(this)();
+            } else {
+                this.render.changePage(index);
+                callback.bind(this)();
+            }
         },
         getCurrentPage: function () {
-            return this.render.startPageIndex + 1;
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'getCurrentPage',param:''}, '*');
+            } else {
+                return this.render.startPageIndex + 1;
+            }
         },
         // 动画跳转
         nextAnimation: function () {
-            this.render.animationManager.next();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'nextAnimation',param:''}, '*');
+            } else {
+                this.render.animationManager.next();
+            }
         },
         nextAnimationSync: function () {
-            this.render.animationManager.next();
-            callback.bind(this)();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'nextAnimation',param:''}, '*');
+                callback.bind(this)();
+            } else {
+                this.render.animationManager.next();
+                callback.bind(this)();
+            }
         },
         preAnimation: function () {
-            this.render.animationManager.pre()
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'preAnimation',param:''}, '*');
+            } else {
+                this.render.animationManager.pre()
+            }
         },
         preAnimationSync: function () {
-            this.render.animationManager.pre();
-            callback.bind(this)();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'preAnimation',param:''}, '*');
+                callback.bind(this)();
+            } else {
+                this.render.animationManager.pre();
+                callback.bind(this)();
+            }
         },
         gotoAnimation: function (animateObj) {
-            this.render.animationManager.gotoAnimation(animateObj);
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'gotoAnimation',param:animateObj}, '*');
+            } else {
+                this.render.animationManager.gotoAnimation(animateObj);
+            }
         },
         gotoAnimationSync: function (animateObj) {
-            this.render.animationManager.gotoAnimation(animateObj);
-            callback.bind(this)();
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'gotoAnimation',param:animateObj}, '*');
+                callback.bind(this)();
+            } else {
+                this.render.animationManager.gotoAnimation(animateObj);
+                callback.bind(this)();
+            }
         },
         getAnimationInfo: function () {
-            return {
-                currentAnimIndex: this.render.animationManager.currentAnimIndex,
-                page: this.render.animationManager.gotoAimationPageIndex,
-                type: this.render.animationManager.gotoAimationType
+            if (this.isCrossDomain) {
+                this.customerIframe.contentWindow.postMessage({type:'getAnimationInfo',param:''}, '*');
+            } else {
+                return {
+                    currentAnimIndex: this.render.animationManager.currentAnimIndex,
+                    page: this.render.animationManager.gotoAimationPageIndex,
+                    type: this.render.animationManager.gotoAimationType
+                }
             }
         },
     }
