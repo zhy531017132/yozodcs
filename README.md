@@ -49,10 +49,10 @@ getCurrentPage|null|number|返回当前页码|render.getCurrentPage()
 --|:--:|--:|--:|--:
 nextAnimation|null|underfined|跳转到下一动画|render.nextAnimation()
 nextAnimationSync|fn|underfined|跳转到下一动画|render.nextAnimationSync(fn)
-preAnimation|null|underfined|跳转到上一动画|render.lastPage()
-preAnimationSync|fn|underfined|跳转到上一动画|render.lastPageSync(fn)
+preAnimation|null|underfined|跳转到上一动画|render.preAnimation()
+preAnimationSync|fn|underfined|跳转到上一动画|render.preAnimationSync(fn)
 gotoAnimation|object1|underfined|跳转到指定页|render.gotoAnimation(object)
-gotoAnimationSync|object1,fn|underfined|跳转到指定页|render.gotoPageSync(object1,fn)
+gotoAnimationSync|object1,fn|underfined|跳转到指定页|render.gotoAnimationSync(object1,fn)
 getAnimationInfo|null|object2|返回当前动画数据|render.getAnimationInfo()
 
 ##### 注释
@@ -62,7 +62,7 @@ object1：
 {
     'pageIndex':number,
     'animationId':number,
-    'type':'next'/'pre
+    'type':'next'/'pre'
 }
 ```
 object2：
@@ -71,10 +71,74 @@ object2：
 {
     'currentAnimIndex':number,
     'page':number,
-    'type':'next'/'pre
+    'type':'next'/'pre'
 }
 ```
-
+#####  demo示例
+跨域（同域）请求html：
+```
+ <script>
+        var red
+        window.onload = function () {
+            red = new DcsRender('cont');
+        }
+        function nextPage() {
+            red.nextPage();
+        }
+ </script>
+```
+跨域时子页面js：
+```
+addEventListener('message', function (event) {
+    //console.log(JSON.stringify(event.data) + "接收到了，子页面开始发送消息");
+    switch (event.data.type) {
+        case 'nextPage':
+            reader.changePageNext();
+            break;
+        case 'lastPage':
+            reader.changePageLast();
+            break;
+        
+        case 'gotoPage':
+            reader.changePage(event.data.param);
+            break;
+        
+        case 'getCurrentPage':
+            var currentPage=reader.startPageIndex + 1;
+            var obj={
+                currentPage:currentPage,
+                type:'getCurrentPage'
+            }
+            window.parent.postMessage(obj, '*');
+            break;
+        
+        case 'nextAnimation':
+            reader.animationManager.next();
+            break;
+        
+        case 'preAnimation':
+            reader.animationManager.pre();
+            break;
+        
+        case 'gotoAnimation':
+            reader.animationManager.gotoAnimation(event.data.param);
+            break;
+        
+        case 'getAnimationInfo':
+            var obj={
+                currentAnimIndex: reader.animationManager.currentAnimIndex,
+                page:reader.animationManager.gotoAimationPageIndex,
+                type: reader.animationManager.gotoAimationType,
+                type:'getAnimationInfo'
+            }
+            window.parent.postMessage(obj, '*');
+            break;
+        
+        default:
+        break;
+    }
+})
+```
 ### 有问题反馈
 在使用中有任何问题，欢迎反馈给我，可以用以下联系方式跟我交流。
 #### 联系方式：18018300481
