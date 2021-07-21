@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Document</title>
+    <style>
+        #content {
+            width: 1000px;
+            height: 900px;
+        }
+
+        #cont {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script src="./jquery-1.11.1.min.js"></script>
+</head>
+
+<body>
+    <div id="content">
+        <button onclick="prePage()">上一页</button>
+        <button onclick="nextPage()">下一页</button>
+        跳转页面<input id='page' />
+        <button onclick="changePage()">跳转</button>
+        <button onclick="getCurrentPage()">获取当前页面</button>
+        <div id='massageDiv'></div>
+        <br>
+        <button onclick="preAnimation()">上一动画</button>
+        <button onclick="nextAnimation()">下一动画</button>
+        跳转动画<input id='animation' />
+        <button onclick="changeAnimation()">跳转动画</button>
+        <button onclick="getAnimationInfo()">返回当前动画数据</button>
+        <button onclick="magnify()">放大</button>
+        <button onclick="shrink()">缩小</button>
+        <button onclick="play()">播放</button>
+        <button onclick="exit()">退出播放</button>
+        <button onclick="isHideSidebar1()">显示隐藏左缩略图</button>
+        <!-- <button onclick="isHideSidebar2()">隐藏左缩略图</button> -->
+        <input id='search' />
+        <button onclick="search()">搜索</button>
+        <button onclick="rotateTrue()">顺时针旋转</button>
+        <button onclick="rotateFalse()">逆时针旋转</button>
+
+        <button onclick="isShowTool1()">隐藏工具栏</button>
+        <button onclick="isShowTool2()">显示工具栏</button>
+        <button onclick="fullScreen()">全屏</button>
+
+
+        <iframe
+            src="http://192.168.0.136:8080/pgindex.html?file=http://192.168.0.136:8080/sample/MjEwNjAyMzg3MTg4MDkw/index.json#"
+            frameborder="0" id="cont" allowfullscreen="true"></iframe>
+
+    </div>
+    <script>
+        // src="http://172.18.21.30:8090/dcs.web8/canvas/pgindex.html?file=/2021/07/15/MjEwNzE1MzIwODQ5MDM3/index.json"
+        //http://172.18.21.30:8090/2021/07/15/MjEwNzE1MzIyODg3ODI5.html
+        // src="http://172.18.21.30:8090/dcs.web8/canvas/index.html?file=/2021/07/12/MjEwNzEyNTgxNDAwNzYz/index.json"
+        // src="http://172.18.21.30:8090/dcs.web8/canvas/sindex.html?file=/2021/07/12/MjEwNzEyNTg0MTMzMTIy/index.json"
+
+
+        //src="http://localhost:8080/sindex.html?file=http://localhost:8080/sample/MjEwNjIyMDcwMjM3OTk0/index.json"
+        //src="http://localhost:8080/index.html?file=http://localhost:8080/sample/MjEwNTI4MTY0NjA2OTM4/index.json"
+        //src="http://localhost:8080/pgindex.html?file=http://localhost:8080/sample/MjEwNTI1NTU2NjkwODU4/index.json"
+        //监听调用方法 ；参数domId为需要全屏的div的id
+        var red
+        window.onload = function () {
+            red = new DcsRender('pgindex', 'cont');
+        }
+        function nextPage() {
+            red.nextPage();
+            // red.nextPageSync(function(){});
+        }
+        function prePage() {
+            red.lastPage();
+        }
+        function changePage() {
+            red.gotoPage($('#page').val());
+        }
+        //获取当前页面
+        function getCurrentPage() {
+            //方法一
+            // red.getCurrentPage().then(data =>{
+            //     console.log(data,'当前页面');
+            // })
+
+            
+            //方法二
+            //将执行函数的外层函数加上async 和await  默认返回的 Promise值就变成了我们要的默认返回值了
+            async function getCurrentPage() {
+                //return await red.getCurrentPage();
+                var value = await red.getCurrentPage();
+                console.log(value)
+            }
+            console.log(getCurrentPage());
+        }
+        function nextAnimation() {
+            red.nextAnimation();
+        }
+        function preAnimation() {
+            red.preAnimation();
+        }
+        function changeAnimation() {
+            var obj = {
+                'pageIndex': 5,
+                'animationId': 2,
+                'type': 'pre'
+            }
+            red.gotoAnimation(obj);
+        }
+        function getAnimationInfo(data) {
+            red.getAnimationInfo().then(data => {
+                console.log(data, '当前动画信息');
+            })
+        }
+
+        function magnify() {
+            red.magnify();
+        }
+        function shrink() {
+            red.shrink();
+        }
+        function play() {
+            red.play();
+        }
+        function search() {
+            red.search($('#search').val());
+        }
+        function rotateTrue() {
+            red.rotate(true);
+        }
+        function rotateFalse() {
+            red.rotate(false);
+        }
+        function exit() {
+            red.exit();
+        }
+        //
+        function isHideSidebar1() {
+            red.isHideSidebar(true);
+        }
+        function isShowTool1() {
+            red.isShowTool(false);
+        }
+        function isShowTool2() {
+            red.isShowTool(true);
+        }
+        //全屏
+        function fullScreen() {
+             red.fullScreen();
+        }
+
+
+    </script>
+</body>
+<!-- <script src="./yozodcs.min.js"></script> -->
+<script src="./yozodcs.js"></script>
+
+</html>
